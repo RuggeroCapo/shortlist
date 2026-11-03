@@ -64,7 +64,10 @@ export const Route = createFileRoute('/api/agent')({
             systemPrompts: [buildSystemPrompt(session)],
             tools: serverWidgetTools,
             agentLoopStrategy: maxIterations(16),
-            modelOptions: { temperature: 0.2, max_tokens: 6000 } as never,
+            // One tool call per turn: parallel calls arrive with their whole
+            // arguments in a single chunk, so components would pop in instead
+            // of filling in while TOOL_CALL_ARGS stream.
+            modelOptions: { temperature: 0.2, max_tokens: 6000, parallel_tool_calls: false } as never,
             abortController,
           }),
         )
