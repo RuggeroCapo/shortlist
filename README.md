@@ -75,6 +75,10 @@ src/lib/trace.ts          raw AG-UI events (onChunk) → folded log
 src/components/Widgets.tsx widget renderers
 ```
 
+## Access
+
+The whole app (pages and `/api/*`) sits behind one shared password, set as `APP_PASSWORD` (`src/server/gate.ts`, wired in `src/start.ts`). Locally it is off when the variable is empty; on Vercel a missing `APP_PASSWORD` refuses every request. Static files (`/assets`, `/samples`) are served by the CDN and stay public; they are fictional samples.
+
 ## Notes and limits
 
 - CV text travels in `forwardedProps` on every turn. The server keeps no state, and nothing is stored.
