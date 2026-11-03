@@ -1,25 +1,33 @@
 import { openaiCompatible } from '@tanstack/ai-openai/compatible'
 import type { StreamChunk } from '@tanstack/ai'
+import { getVercelOidcToken } from '@vercel/oidc'
 import { MODELS } from '#/lib/session'
 
 const MODEL_IDS = MODELS.map((m) => m.id)
 
-let provider: ReturnType<typeof createProvider> | null = null
+/**
+ * Gateway credentials: an explicit AI_GATEWAY_API_KEY wins (local dev);
+ * on Vercel the project's OIDC token authenticates with the AI Gateway, so
+ * no secret has to be copied into the deployment.
+ */
+async function gatewayKey(): Promise<string> {
+  if (process.env.AI_GATEWAY_API_KEY) return process.env.AI_GATEWAY_API_KEY
+  try {
+    return await getVercelOidcToken()
+  } catch {
+    throw new Error('Set AI_GATEWAY_API_KEY (see .env.example) or deploy on Vercel for OIDC auth')
+  }
+}
 
-function createProvider() {
-  const apiKey = process.env.AI_GATEWAY_API_KEY
-  if (!apiKey) throw new Error('AI_GATEWAY_API_KEY is not set (see .env.example)')
+/** Provider per request: OIDC tokens are short-lived, so never cache the key. */
+export async function gatewayProvider() {
+  const apiKey = await gatewayKey()
   return openaiCompatible({
     name: 'vercel-ai-gateway',
     baseURL: process.env.AI_GATEWAY_BASE_URL ?? 'https://ai-gateway.vercel.sh/v1',
     apiKey,
     models: MODEL_IDS as Array<string>,
   })
-}
-
-export function gatewayAdapter(model: string) {
-  provider ??= createProvider()
-  return provider(model as never)
 }
 
 /** Fallback order, set on the server only: the model is an implementation detail of the agent. */

@@ -6,7 +6,7 @@ import {
   toServerSentEventsResponse,
 } from '@tanstack/ai'
 import { z } from 'zod'
-import { gatewayAdapter, modelChain, withModelFallback } from '#/server/gateway'
+import { gatewayProvider, modelChain, withModelFallback } from '#/server/gateway'
 import { buildSystemPrompt } from '#/server/prompt'
 import { serverWidgetTools } from '#/server/tools'
 
@@ -49,9 +49,15 @@ export const Route = createFileRoute('/api/agent')({
         const abortController = new AbortController()
         request.signal.addEventListener('abort', () => abortController.abort())
 
+        let provider
+        try {
+          provider = await gatewayProvider()
+        } catch (error) {
+          return new Response(error instanceof Error ? error.message : 'Gateway not configured', { status: 500 })
+        }
         const stream = withModelFallback(modelChain(), (m) =>
           chat({
-            adapter: gatewayAdapter(m),
+            adapter: provider(m as never),
             messages: params.messages,
             threadId: params.threadId,
             runId: params.runId,
