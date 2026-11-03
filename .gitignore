@@ -13,3 +13,5 @@ __unconfig*
 todos.json
 .taste-skill
 .vercel
+.env*
+!.env.example
