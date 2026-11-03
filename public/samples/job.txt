@@ -1,0 +1,13 @@
+Senior Frontend Engineer, Design Systems — Northwind Bank (Digital)
+
+We are looking for a senior engineer to own our new design system across web banking, onboarding and the internal back-office.
+
+You will:
+- Build and maintain a React + TypeScript component library used by 10+ squads
+- Own the design-token pipeline together with the design team (Figma)
+- Make accessibility (WCAG 2.2 AA) a default, not an audit
+- Set up visual regression and component testing
+- Coach product engineers on adopting the system; write docs people actually read
+
+Must have: 6+ years frontend, deep React and TypeScript, CSS architecture, accessibility.
+Nice to have: fintech or regulated environment, Storybook, open-source or public speaking, Italian or Spanish.
